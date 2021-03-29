@@ -1,0 +1,137 @@
+openapi: 3.0.1
+
+info:
+  title: Payment API
+  description: API взаимодействия с балансом аккаунта
+  version: "1.0"
+
+servers:
+  - url: /payment
+
+paths:
+  /account:
+    post:
+      tags:
+        - 'account'
+      summary: Create account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example:
+                    "ALEX"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /account/{id}:
+    post:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: int
+        - name: Source-Type
+          in: header
+          description: source type from client (game, server, payment)
+          required: true
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payload'
+      responses:
+        200:
+          description: "Request success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: "Server error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        jsonapi:
+          $ref: '#/components/schemas/JsonApi'
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/Account'
+            - $ref: '#/components/schemas/Payload'
+        errors:
+          type: array
+          description: Error list
+          items:
+            type: object
+            properties:
+              title:
+                description: Type error
+                type: string
+              detail:
+                description: detail info
+                type: string
+
+    Meta:
+      type: object
+      description: information about request
+      properties:
+        code:
+          description: HTTP code
+          type: integer
+        status:
+          description: status request
+          type: boolean
+
+    JsonApi:
+      type: object
+      properties:
+        version:
+          description: Api version
+          type: string
+
+    Account:
+      type: object
+      properties:
+        name:
+          type: string
+          description: account name
+
+    Payload:
+      type: object
+      properties:
+        state:
+          type: string
+          description: "action type"
+        amount:
+          type: string
+          description: "amount value"
+        transactionId:
+          type: string
+          description: "unique hash of transaction"
+
+
+
