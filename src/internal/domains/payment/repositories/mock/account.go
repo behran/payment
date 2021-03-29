@@ -14,8 +14,8 @@ type AccountRepositoryMock struct {
 	mock.Mock
 }
 
-//FindByID ...
-func (a AccountRepositoryMock) FindByID(ctx context.Context, id int) error {
+//IsExist ...
+func (a AccountRepositoryMock) IsExist(ctx context.Context, id int) error {
 	args := a.Called(ctx, id)
 	return args.Error(0)
 }

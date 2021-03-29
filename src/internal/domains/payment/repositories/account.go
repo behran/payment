@@ -39,8 +39,8 @@ func NewAccount(manager *database.ConnectManager) (*AccountRepository, error) {
 	return repository, nil
 }
 
-//FindByID ...
-func (r AccountRepository) FindByID(ctx context.Context, id int) error {
+//IsExist ...
+func (r AccountRepository) IsExist(ctx context.Context, id int) error {
 	query := "SELECT * FROM accounts WHERE account_id = $1"
 
 	return r.pool.QueryRowxContext(ctx, query, id).Err()

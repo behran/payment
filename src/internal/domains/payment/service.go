@@ -20,7 +20,7 @@ func New(r contracts.IAccountRepository) *Service {
 
 //FindAccaunt ...
 func (s Service) FindAccaunt(ctx context.Context, id int) error {
-	return s.r.FindByID(ctx, id)
+	return s.r.IsExist(ctx, id)
 }
 
 //CreateAccount ...
@@ -35,7 +35,7 @@ func (s Service) UpdateAccountAmount(ctx context.Context, id int, payload dto.Pa
 
 //RollbackTransaction ...
 func (s Service) RollbackTransaction(ctx context.Context, rollback dto.RollBack) error {
-	if err := s.r.FindByID(ctx, rollback.AccountID); err != nil {
+	if err := s.r.IsExist(ctx, rollback.AccountID); err != nil {
 		return err
 	}
 	return s.r.RollbackTransaction(ctx, rollback)
