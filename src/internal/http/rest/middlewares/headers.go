@@ -1,12 +1,12 @@
 package middlewares
 
 import (
+	"slices"
+
+	"github.com/valyala/fasthttp"
 	"payment/internal/dto"
 	"payment/internal/http/rest/response"
 	"payment/internal/http/rest/response/errors"
-	"payment/internal/tools"
-
-	"github.com/valyala/fasthttp"
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 	sourcePayment = "payment"
 )
 
-//HeadersMiddleware ...
+// HeadersMiddleware ...
 func HeadersMiddleware(handle fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Set(fasthttp.HeaderContentType, contentType)
@@ -36,22 +36,21 @@ func HeadersMiddleware(handle fasthttp.RequestHandler) fasthttp.RequestHandler {
 	}
 }
 
-//CheckValidHeadersMiddleware ...
+// CheckValidHeadersMiddleware ...
 func CheckValidHeadersMiddleware(handle fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
-		payload := ctx.UserValue(PayloadKey).(dto.Payload)
 		sourceType := string(ctx.Request.Header.Peek("Source-Type"))
+
+		payload := ctx.UserValue(PayloadKey).(dto.Payload)
 		payload.SetSourceType(sourceType)
 
-		if !tools.IsExistSlice(payload.SourceType(), []string{
+		if !slices.Contains([]string{
 			sourceGame, sourcePayment, sourceServer,
-		}) {
-			response.Error(errors.ErrSourceType, ctx)
+		}, payload.SourceType()) {
+			response.Error(ctx, errors.ErrSourceType)
 			return
 		}
-
 		ctx.SetUserValue(PayloadKey, payload)
-
 		// next
 		handle(ctx)
 	}

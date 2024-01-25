@@ -2,25 +2,25 @@ package logger
 
 import (
 	"log"
-	"sync"
+	"time"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-//Logger ...
-var (
-	Logger *zap.Logger
-	once   sync.Once
-)
+// Logger ...
+var Logger *zap.Logger
 
-//NewLogger ...
+// New ...
 func New() *zap.Logger {
-	once.Do(func() {
-		var err error
-		Logger, err = zap.NewProduction()
-		if err != nil {
-			log.Fatal(err)
-		}
-	})
+	var err error
+
+	config := zap.NewProductionConfig()
+	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
+
+	Logger, err = config.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
 	return Logger
 }

@@ -4,21 +4,26 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"strconv"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 	"payment/internal/contracts"
+	logger "payment/pkg/log"
+	"payment/pkg/metric"
 
 	"github.com/valyala/fasthttp"
 )
 
-//Response ...
+// Response ...
 type Response struct {
-	Meta     Meta        `json:"meta"`
-	JSONAPI  JSONAPI     `json:"jsonapi"`
-	Response interface{} `json:"data,omitempty"`
-	Errors   []Err       `json:"errors,omitempty"`
+	Meta     Meta    `json:"meta"`
+	JSONAPI  JSONAPI `json:"jsonapi"`
+	Response any     `json:"data,omitempty"`
+	Errors   []Err   `json:"errors,omitempty"`
 }
 
-//Response objects ...
+// Response objects ...
 type (
 	//Meta ...
 	Meta struct {
@@ -36,11 +41,11 @@ type (
 	}
 )
 
-//Version ...
+// Version ...
 var Version = os.Getenv("API_VERSION")
 
-//OK ...
-func OK(body interface{}, ctx *fasthttp.RequestCtx) {
+// OK ...
+func OK(ctx *fasthttp.RequestCtx, body any) {
 	var payload = Response{
 		Meta: Meta{
 			Code:   http.StatusOK,
@@ -51,11 +56,11 @@ func OK(body interface{}, ctx *fasthttp.RequestCtx) {
 		},
 		Response: body,
 	}
-	send(payload, http.StatusOK, ctx)
+	send(ctx, payload, http.StatusOK)
 }
 
-//Error ...
-func Error(err error, ctx *fasthttp.RequestCtx) {
+// Error ...
+func Error(ctx *fasthttp.RequestCtx, err error) {
 	e := err.(contracts.IPaymentError)
 	payload := Response{
 		Meta: Meta{
@@ -72,10 +77,18 @@ func Error(err error, ctx *fasthttp.RequestCtx) {
 			},
 		},
 	}
-	send(payload, e.StatusCode(), ctx)
+	send(ctx, payload, e.StatusCode())
 }
 
-func send(r Response, code int, ctx *fasthttp.RequestCtx) {
+func send(ctx *fasthttp.RequestCtx, r Response, code int) {
+	metric.CodeHTTPCounter.With(prometheus.Labels{
+		"code":   strconv.Itoa(code),
+		"method": string(ctx.Method()),
+		"path":   string(ctx.Path()),
+	}).Inc()
 	ctx.SetStatusCode(code)
-	json.NewEncoder(ctx).Encode(r)
+
+	if err := json.NewEncoder(ctx).Encode(r); err != nil {
+		logger.Logger.Error("fail send response", zap.Error(err))
+	}
 }

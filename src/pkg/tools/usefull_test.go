@@ -3,7 +3,7 @@ package tools_test
 import (
 	"testing"
 
-	"payment/internal/tools"
+	"payment/pkg/tools"
 
 	"github.com/stretchr/testify/assert"
 )

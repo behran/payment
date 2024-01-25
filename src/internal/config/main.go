@@ -3,29 +3,30 @@ package config
 import (
 	"os"
 
-	"payment/internal/tools"
+	"payment/pkg/tools"
 )
 
-//Config ...
+// Config ...
 type Config struct {
 	App      App
 	Database Database
 }
 
-//App ...
+// App ...
 type App struct {
 	Port         string
+	Hostname     string
 	Env          string
 	Version      string
 	TimeRollback int
 }
 
-//Database ...
+// Database ...
 type Database struct {
 	Postgre map[int]Postgre
 }
 
-//Postgre ...
+// Postgre ...
 type Postgre struct {
 	Host     string
 	Port     string
@@ -34,12 +35,12 @@ type Postgre struct {
 	Database string
 }
 
-//PaymentConnect ...
+// PaymentConnect ...
 const (
 	PaymentConnect = iota
 )
 
-//New ...
+// New ...
 func New() Config {
 	return Config{
 		App: App{

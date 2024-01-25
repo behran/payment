@@ -1,1 +1,1 @@
-drom table accounts;
+drop table accounts;

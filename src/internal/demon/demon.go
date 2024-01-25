@@ -12,14 +12,14 @@ import (
 	"go.uber.org/zap"
 )
 
-//Demon ...
+// Demon ...
 type Demon struct {
 	stop   chan struct{}
 	ticker *time.Ticker
 	events map[int]IEvent
 }
 
-//New ...
+// New ...
 func New(config config.Config) *Demon {
 	return &Demon{
 		ticker: time.NewTicker(time.Duration(config.App.TimeRollback) * time.Second),
@@ -30,7 +30,7 @@ func New(config config.Config) *Demon {
 	}
 }
 
-//Start Demon ...
+// Start Demon ...
 func Start(lc fx.Lifecycle, demon *Demon) {
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -46,7 +46,7 @@ func Start(lc fx.Lifecycle, demon *Demon) {
 	})
 }
 
-//Tick ...
+// Tick ...
 func (d Demon) Tick() {
 	for {
 		select {
@@ -61,5 +61,5 @@ func (d Demon) Tick() {
 	}
 }
 
-//Close ...
+// Stop ...
 func (d Demon) Stop() { d.stop <- struct{}{} }

@@ -22,10 +22,8 @@ const (
 
 //Run ...
 func (r RollbackTx) Run() error {
-	ctx := context.Background()
-	rb := dto.RollBack{
+	return facade.Service().Payment().RollbackTransaction(context.Background(), dto.RollBack{
 		AccountID:  defaultUserID,
 		SourceType: rollbackByServer,
-	}
-	return facade.Service().Payment().RollbackTransaction(ctx, rb)
+	})
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-//Middleware ...
+// Middleware ...
 type Middleware func(fasthttp.RequestHandler) fasthttp.RequestHandler
 
 const (
@@ -17,18 +17,18 @@ var (
 	CreateAccountPayload = []Middleware{
 		HeadersMiddleware,
 		AccountMiddleware,
-		LogMiddleware,
+		MetricTimeResponseMiddleware,
 	}
 	UpdateAccountPayload = []Middleware{
-		HeadersMiddleware,
 		PayloadMiddleware,
 		CheckValidHeadersMiddleware,
 		AccountIDMiddleware,
-		LogMiddleware,
+		HeadersMiddleware,
+		MetricTimeResponseMiddleware,
 	}
 )
 
-//ApplyMiddleware iterator of middleware ...
+// ApplyMiddleware iterator of middleware ...
 func ApplyMiddleware(handle fasthttp.RequestHandler, middleware ...Middleware) fasthttp.RequestHandler {
 	if len(middleware) < 1 {
 		return handle

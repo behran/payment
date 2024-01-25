@@ -9,27 +9,27 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-//CreateAccount ...
+// CreateAccount ...
 func CreateAccount(ctx *fasthttp.RequestCtx) {
 	account := ctx.UserValue(middlewares.AccountKey).(dto.Account)
 
 	result, err := facade.Service().Payment().CreateAccount(ctx, account)
 	if err != nil {
-		response.Error(err, ctx)
+		response.Error(ctx, err)
 		return
 	}
-	response.OK(result, ctx)
+	response.OK(ctx, result)
 }
 
-//UpdateAccount ...
+// UpdateAccount ...
 func UpdateAccount(ctx *fasthttp.RequestCtx) {
 	id := ctx.UserValue(middlewares.AccountIDKey).(int)
 	payload := ctx.UserValue(middlewares.PayloadKey).(dto.Payload)
 
 	result, err := facade.Service().Payment().UpdateAccountAmount(ctx, id, payload)
 	if err != nil {
-		response.Error(err, ctx)
+		response.Error(ctx, err)
 		return
 	}
-	response.OK(result, ctx)
+	response.OK(ctx, result)
 }

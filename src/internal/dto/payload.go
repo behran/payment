@@ -1,8 +1,10 @@
 package dto
 
-import "payment/internal/tools"
+import (
+	"payment/pkg/tools"
+)
 
-//Payload ...
+// Payload ...
 type Payload struct {
 	State         string `json:"state" validate:"required"`
 	Amount        string `json:"amount" validate:"required"`
@@ -13,10 +15,10 @@ type Payload struct {
 
 const lost = "lost"
 
-//AmountDecimal ...
+// AmountDecimal ...
 func (p Payload) AmountDecimal() float64 { return p.amountDecimal }
 
-//SetAmountInt ...
+// SetAmountInt ...
 func (p *Payload) SetAmountDecimal(amountDecimal float64) {
 	// We handle the situation when we lost a positive amount
 	if p.State == lost {
@@ -27,8 +29,8 @@ func (p *Payload) SetAmountDecimal(amountDecimal float64) {
 
 }
 
-//SourceType ...
+// SourceType ...
 func (p Payload) SourceType() string { return p.sourceType }
 
-//SetSourceType ...
+// SetSourceType ...
 func (p *Payload) SetSourceType(sourceType string) { p.sourceType = sourceType }

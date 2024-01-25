@@ -32,7 +32,6 @@ curl --location --request POST 'http://127.0.0.1:8090/payment/account/1' \
 
 # Evn files
 * .env - for main application
-* .env.test - for test application
 
 ### ENV description
 ```

@@ -1,20 +1,23 @@
 package main
 
 import (
-	"time"
+	"context"
+	"log"
 
 	application "payment/internal/app"
-	logger "payment/pkg/log"
-
-	"go.uber.org/zap"
 )
 
 func main() {
-	// waiting postgres container ...
-	time.Sleep(20*time.Second)
-	if err := application.Run(); err != nil {
-		logger.Logger.Fatal("Application didn't start",
-			zap.Error(err),
-		)
+	ctx := context.Background()
+
+	containers := application.Containers()
+
+	if err := containers.Start(ctx); err != nil {
+		log.Fatalf("Application didn't start `err`:%s", err)
+	}
+	<-containers.Done()
+
+	if err := containers.Stop(ctx); err != nil {
+		log.Fatalf("Application didn't stop `err`:%s", err)
 	}
 }

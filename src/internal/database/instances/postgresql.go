@@ -11,13 +11,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//PostgreSQL ...
+// PostgreSQL ...
 type PostgreSQL struct {
 	config config.Database
 	pool   map[int]*sqlx.DB
 }
 
-//NewMongoInstances ...
+// NewPostgreSQL ...
 func NewPostgreSQL(config config.Database) *PostgreSQL {
 	return &PostgreSQL{
 		config: config,
@@ -25,7 +25,7 @@ func NewPostgreSQL(config config.Database) *PostgreSQL {
 	}
 }
 
-//Init ...
+// Init ...
 func (m *PostgreSQL) Init() error {
 	for k := range m.config.Postgre {
 		connect, err := m.create(m.config.Postgre[k])
@@ -57,13 +57,22 @@ func (m PostgreSQL) create(config config.Postgre) (*sqlx.DB, error) {
 	return connect, nil
 }
 
-//Connect ...
+// Connect ...
 func (m PostgreSQL) Connect(name int) (*sqlx.DB, error) {
 	connect, exist := m.pool[name]
 	if !exist {
 		return nil, fmt.Errorf("connect postgresql `%d` not found", name)
 	}
 	return connect, nil
+}
+
+func (m PostgreSQL) Disconnect() error {
+	for k := range m.pool {
+		if err := m.pool[k].Close(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (m *PostgreSQL) append(key int, connect *sqlx.DB) { m.pool[key] = connect }

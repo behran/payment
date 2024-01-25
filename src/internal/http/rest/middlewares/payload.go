@@ -2,17 +2,16 @@ package middlewares
 
 import (
 	"encoding/json"
+	"slices"
 	"strconv"
-
-	"payment/internal/dto"
-	"payment/internal/http/rest/response"
-	"payment/internal/http/rest/response/errors"
-	"payment/internal/tools"
-	logger "payment/pkg/log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
+	"payment/internal/dto"
+	"payment/internal/http/rest/response"
+	"payment/internal/http/rest/response/errors"
+	logger "payment/pkg/log"
 )
 
 const (
@@ -20,34 +19,33 @@ const (
 	lost = "lost"
 )
 
-//PayloadMiddleware ...
+// PayloadMiddleware ...
 func PayloadMiddleware(handle fasthttp.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		var payload dto.Payload
 
 		if err := json.Unmarshal(ctx.Request.Body(), &payload); err != nil {
 			logger.Logger.Error("fail unmarshal request body `payload`", zap.Error(err))
-			response.Error(errors.ErrInvalidBody, ctx)
+			response.Error(ctx, errors.ErrInvalidBody)
 			return
 		}
 		if err := validator.New().Struct(payload); err != nil {
 			logger.Logger.Error("validate failed body `payload`", zap.Error(err))
-			response.Error(errors.ErrInvalidBody, ctx)
+			response.Error(ctx, errors.ErrInvalidBody)
 			return
 		}
 
-		if !tools.IsExistSlice(payload.State, []string{
+		if !slices.Contains([]string{
 			win, lost,
-		}) {
-			response.Error(errors.ErrState, ctx)
+		}, payload.State) {
+			response.Error(ctx, errors.ErrState)
 			return
 		}
 		amount, err := strconv.ParseFloat(payload.Amount, 64)
 		if err != nil {
-			response.Error(errors.ErrAmount, ctx)
+			response.Error(ctx, errors.ErrAmount)
 			return
 		}
-
 		payload.SetAmountDecimal(amount)
 
 		ctx.SetUserValue(PayloadKey, payload)
