@@ -30,6 +30,9 @@ curl --location --request POST 'http://127.0.0.1:8090/payment/account/1' \
 # Swagger Docs
 - **[documentation](http://127.0.0.1:8090/documentation)**
 
+# Prometheus Metrics
+- **[metrics](http://127.0.0.1:8090/metrics)**
+
 # Evn files
 * .env - for main application
 
