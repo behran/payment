@@ -99,7 +99,7 @@ func (r AccountRepository) UpdateAmount(ctx context.Context, accountID int, payl
 	queryInsert := "INSERT INTO transactions (unique_id, state, amount, status, source_type,account_id) " +
 		"VALUES ($1, $2, $3, $4, $5, $6)"
 
-	// TODO: чекнуть типы, мог ошибиться  ...
+
 	if _, err := tx.ExecContext(ctx, queryInsert,
 		payload.TransactionID,
 		payload.State,
